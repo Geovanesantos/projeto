@@ -100,12 +100,12 @@ export default function Cadastro() {
   };
   return (
     <>
-      <div style={{ display: "flex", marginLeft: 10 }}>
+      <div style={{ display: "flex", marginLeft: 10, background: "#1976d2", justifyContent: "space-around", maxWidth: 730}}>
         <Typography
           variant="h6"
           noWrap
           component="div"
-          sx={{ color: "#1976d2" }}
+          sx={{ color: "white" }}
         >
           Cadastrado de Chamado
         </Typography>
