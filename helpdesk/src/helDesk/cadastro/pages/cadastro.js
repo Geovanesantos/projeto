@@ -11,34 +11,53 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 
 import Campos from "../components/Campos";
 import "../../../App.css";
 import { cadastroUseCases } from "../useCases/useCases";
 
+import JoditEditor from "jodit-react";
+
 export default function Cadastro() {
   const [motivo, setMotivo] = React.useState(1);
+  const [software, setSoftware] = React.useState(1);
+  const [prioridade, setPrioridade] = React.useState("");
   const [ramal, setRamal] = React.useState("");
   const [viewInfra, setViewInfra] = React.useState("");
+  const [description, setDescription] = React.useState("");
   const [listMotivo, setListMotivo] = React.useState([]);
+  const [listSoftware, setListSoftware] = React.useState([]);
   const [infraestrutura, setInfraestrutura] = React.useState(false);
-  
-  const handleChangeInfra = (event) => {
-    setInfraestrutura(event.target.value);
-console.log('clucou',infraestrutura);
-    const getInfra = async () => {
-        const flowCodes = await cadastroUseCases.getMotivo(infraestrutura);
-        return flowCodes;
-    };
-      getInfra().then((response) => {
-        setListMotivo(response.reasons);
-        console.log('retorno',listMotivo);
-      });
 
+  const handleChangeInfra = (event) => {
+    let novosItens = [];
+    setInfraestrutura(event.target.value);
+    console.log("clucou", infraestrutura);
+    const getInfra = async () => {
+      const flowCodes = await cadastroUseCases.getMotivo(infraestrutura);
+      return flowCodes;
+    };
+    getInfra().then((response) => {
+      setListMotivo(response.reasons);
+
+      listMotivo.forEach((element) => {
+        element.subjects.forEach((it) => {
+          novosItens.push(it);
+        });
+      });
+      setListSoftware(novosItens);
+      console.log("listSoftware", listSoftware);
+    });
   };
 
   const handleChangeMotivo = (event) => {
     setMotivo(event.target.value);
+  };
+  const handleChangePrioridade = (event) => {
+    setPrioridade(event.target.value);
   };
 
   const handleChangeRamal = (event) => {
@@ -48,8 +67,10 @@ console.log('clucou',infraestrutura);
       setInfraestrutura("");
     }
   };
-
-/*   React.useEffect(() => {
+  const handleChangemSoftware = (event) => {
+    setSoftware(event.target.value);
+  };
+  function CadastraTicket() {
     const getCadastraTicket = async () => {
       const flowCodes = await cadastroUseCases.cadastraTicket();
 
@@ -61,81 +82,212 @@ console.log('clucou',infraestrutura);
 
       //setStepFlow(response.data.flow);
     });
-  }, []);
- */
+  }
+
+  /*   React.useEffect(() => {
+
+}, []);
+*/
+  /* listMotivo.forEach(element => {
+    console.log("<<>>>>",element.subjects); 
+    setListSoftware(element.subjects);   
+}); */
+
+  const editor = React.useRef(null);
+  const [content, setContent] = React.useState("");
+  const config = {
+    readonly: false, // all options from https://xdsoft.net/jodit/docs/,
+  };
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <TextField
-          sx={{ m: 1, width: "10ch" }}
-          label="Ramal"
-          id="outlined-size-small"
-          defaultValue=""
-          size="small"
-          onChange={handleChangeRamal}
-        />
-        {ramal !== "" && viewInfra === "" ? (
-          <ArrowForwardIcon color="primary" onClick={(e) => setViewInfra(1)}>
-            add_circle
-          </ArrowForwardIcon>
-        ) : (
-          ""
-        )}
+      <div style={{ display: "flex", marginLeft: 10 }}>
+        <Typography
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{ color: "#1976d2" }}
+        >
+          Cadastrado de Chamado
+        </Typography>
       </div>
-      {viewInfra === 1 ? (
-        <FormControl>
-          <FormLabel id="demo-row-radio-buttons-group-label">
-            Infraestrutura
-          </FormLabel>
-          <RadioGroup
-            row
-            aria-labelledby="demo-row-radio-buttons-group-label"
-            name="row-radio-buttons-group"
-            value={infraestrutura}
-            onChange={handleChangeInfra}
-          >
-            <FormControlLabel value={true} control={<Radio />} label="Sim" />
-            <FormControlLabel value={false} control={<Radio />} label="Não" />
-          </RadioGroup>
-        </FormControl>
-      ) : (
-        ""
-      )}
-
       <Box
         component="form"
-        sx={{ "& .MuiTextField-root": { m: 1, width: "25ch" } }}
+        sx={{ "& .MuiTextField-root": { m: 1, width: "50ch" } }}
         noValidate
         autoComplete="off"
       >
-        <div className={infraestrutura ? "" : "escondeDiv"}>
-          <FormControl sx={{ m: 1, minWidth: 150 }} size="small">
-            <InputLabel id="demo-select-small">Motivo</InputLabel>
-            <Select
-              labelId="demo-select-small"
-              id="demo-select-small"
-              value={motivo}
-              label="Motivo"
-              onChange={handleChangeMotivo}
-            >
-              {/*               <MenuItem value="">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2 , 1fr)",
+            maxWidth: "1100px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <TextField
+              sx={{ m: 1, width: "10ch" }}
+              label="Contato"
+              id="outlined-size-small"
+              defaultValue=""
+              size="small"
+              onChange={handleChangeRamal}
+            />
+            {ramal !== "" && viewInfra === "" ? (
+              <ArrowForwardIcon
+                color="primary"
+                onClick={(e) => setViewInfra(1)}
+              >
+                add_circle
+              </ArrowForwardIcon>
+            ) : (
+              ""
+            )}
+          </div>
+          {viewInfra === 1 ? (
+            <div>
+              <FormControl sx={{ m: 1, minWidth: 150 }} size="small">
+                <FormLabel id="demo-row-radio-buttons-group-label">
+                  Infraestrutura
+                </FormLabel>
+                <RadioGroup
+                  row
+                  aria-labelledby="demo-row-radio-buttons-group-label"
+                  name="row-radio-buttons-group"
+                  value={infraestrutura}
+                  onChange={handleChangeInfra}
+                >
+                  <FormControlLabel
+                    value={false}
+                    control={<Radio />}
+                    label="Sim"
+                  />
+                  <FormControlLabel
+                    value={true}
+                    control={<Radio />}
+                    label="Não"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </div>
+          ) : (
+            ""
+          )}
+          <div className={infraestrutura ? "" : "escondeDiv"}>
+            <FormControl sx={{ m: 1, minWidth: 150 }} size="small">
+              <InputLabel id="demo-select-small">Motivo</InputLabel>
+              <Select
+                labelId="demo-select-small"
+                id="demo-select-small"
+                value={motivo}
+                label="Motivo"
+                onChange={handleChangeMotivo}
+              >
+                {/*               <MenuItem value="">
                 <em> </em>
-              </MenuItem> */}
-              {
-                listMotivo.map((item)=>(
-                    <MenuItem value={item.uuid}>{item.description}</MenuItem> 
-                ))
-              }
-            </Select>
-          </FormControl>
-          <Campos value={motivo} />
-          <div>
+            </MenuItem> */}
+                {listMotivo.map((item) => (
+                  <MenuItem value={item.uuid}>{item.description}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
+
+          <div className={infraestrutura ? "" : "escondeDiv"}>
+            <FormControl sx={{ m: 1, minWidth: 150 }} size="small">
+              <InputLabel id="demo-select-small">Software</InputLabel>
+              <Select
+                labelId="demo-select-small"
+                id="demo-select-small"
+                value={software}
+                label="Software"
+                onChange={handleChangemSoftware}
+              >
+                {listSoftware.map((item) => (
+                  <MenuItem value={item.uuid}>{item.description}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
+          {/*           <div className={infraestrutura ? "" : "escondeDiv"}>
+            <Campos value={motivo} />
+          </div> */}
+          <div className={infraestrutura ? "" : "escondeDiv"}>
             <TextField
               label="Titulo"
               id="outlined-size-small"
               defaultValue=""
               size="small"
             />
+          </div>
+          <div className={infraestrutura ? "" : "escondeDiv"}>
+            <FormControl sx={{ m: 1, minWidth: 150 }} size="small">
+              <InputLabel id="demo-select-small">Prioridade</InputLabel>
+              <Select
+                labelId="demo-select-small"
+                id="demo-select-small"
+                value={prioridade}
+                label="Prioridade"
+                onChange={handleChangePrioridade}
+                style={prioridade == 2 ? { color: "red" } : {}}
+              >
+                {/*               <MenuItem value="">
+                <em> </em>
+            </MenuItem> */}
+                <MenuItem value={1}>Padrão</MenuItem>
+                <MenuItem value={2} style={{ color: "red" }}>
+                  Urgente
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </div>
+        </div>
+
+        {/* 
+            descriçõ do problema
+      */}
+        <div
+          style={
+            infraestrutura
+              ? {
+                  maxWidth: 707,
+                  marginLeft:9
+                }
+              : { display: "none" }
+          }
+        >
+          <JoditEditor
+            ref={editor}
+            value={content}
+            config={config}
+            tabIndex={1} // tabIndex of textarea
+            onBlur={(newContent) => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
+            onChange={(newContent) => {}}
+          />
+        </div>
+
+        {/* 
+            div Botões para confirmar
+        */}
+        <div
+          style={
+            infraestrutura
+              ? {
+                  display: "grid",
+                  maxWidth: 1092,
+                  gridTemplateColumns: "repeat(2, 1fr)",
+                  marginLeft: 10,
+                  marginTop: 20,
+                }
+              : { display: "none" }
+          }
+        >
+          <div>
+            <Button variant="outlined">Voltar</Button>
+          </div>
+          <div>
+            <Button variant="contained" onClick={CadastraTicket}>
+              Confirmar
+            </Button>
           </div>
         </div>
       </Box>

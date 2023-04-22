@@ -15,25 +15,6 @@ export default function Campos(children) {
     if(children.value > 0){
         return (
             <>
-                <div className={children.value > 4 ? 'escondeDiv' : ''}>
-                <FormControl sx={{ m: 1, minWidth: 150 }} size="small">
-                    <InputLabel id="demo-select-small">Software</InputLabel>
-                    <Select
-                    labelId="demo-select-small"
-                    id="demo-select-small"
-                    value={motivo}
-                    label="Software"
-                    onChange={handleChangemMotivo}
-                    >
-                    <MenuItem value="">
-                        <em> </em>
-                    </MenuItem>
-                    <MenuItem value={1}>SINGE</MenuItem>
-                    <MenuItem value={2}>SALLE</MenuItem>
-                    <MenuItem value={3}>CONECT_RH</MenuItem>
-                    </Select>
-                </FormControl>
-                </div>
                 <div className={children.value == 6 ? '' : 'escondeDiv'}>
                 <FormControl sx={{ m: 1, minWidth: 150 }} size="small">
                     <InputLabel id="demo-select-small">Onde ocorreu</InputLabel>
