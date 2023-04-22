@@ -10,6 +10,15 @@ class CadastroUseCases {
         const response = await cadastroRepository.GetMotivo(infraestrutura)
         return response
     } 
+    async getSoftware(motivo) {
+        const response = await cadastroRepository.GetSoftware(motivo)
+        return response
+    }     
+    async getPrioridade() {
+        const response = await cadastroRepository.GetPrioridade()
+        return response
+    }       
+    
 
 }
 export const cadastroUseCases = new CadastroUseCases();

@@ -19,42 +19,64 @@ import Campos from "../components/Campos";
 import "../../../App.css";
 import { cadastroUseCases } from "../useCases/useCases";
 
+import api from "../../api/Api";
+
 import JoditEditor from "jodit-react";
 
 export default function Cadastro() {
-  const [motivo, setMotivo] = React.useState(1);
-  const [software, setSoftware] = React.useState(1);
+  const [motivo, setMotivo] = React.useState("");
+  const [software, setSoftware] = React.useState("");
   const [prioridade, setPrioridade] = React.useState("");
+  const [titulo, setTitulo] = React.useState("");
   const [ramal, setRamal] = React.useState("");
   const [viewInfra, setViewInfra] = React.useState("");
-  const [description, setDescription] = React.useState("");
   const [listMotivo, setListMotivo] = React.useState([]);
   const [listSoftware, setListSoftware] = React.useState([]);
-  const [infraestrutura, setInfraestrutura] = React.useState(false);
+  const [listPrioridade, setListPrioridade] = React.useState([]);
+  const [infraestrutura, setInfraestrutura] = React.useState("");
 
   const handleChangeInfra = (event) => {
-    let novosItens = [];
     setInfraestrutura(event.target.value);
     console.log("clucou", infraestrutura);
     const getInfra = async () => {
-      const flowCodes = await cadastroUseCases.getMotivo(infraestrutura);
+      const flowCodes = await cadastroUseCases.getMotivo(event.target.value);
       return flowCodes;
     };
     getInfra().then((response) => {
       setListMotivo(response.reasons);
 
-      listMotivo.forEach((element) => {
-        element.subjects.forEach((it) => {
-          novosItens.push(it);
-        });
-      });
-      setListSoftware(novosItens);
-      console.log("listSoftware", listSoftware);
+      //   console.log("listMotivo",listMotivo);
+
+      //   listMotivo.forEach((element) => {
+      //     element.subjects.forEach((it) => {
+      //         console.log('it',it);
+      //       novosItens.push(it);
+      //     });
+      //   });
+      //   setListSoftware(novosItens);
+      //   console.log("listSoftware", listSoftware);
     });
   };
 
   const handleChangeMotivo = (event) => {
     setMotivo(event.target.value);
+    console.log("motivo", motivo);
+
+    const getSoftware = async () => {
+      const flowCodes = await cadastroUseCases.getSoftware(event.target.value);
+      return flowCodes;
+    };
+    getSoftware().then((response) => {
+      setListSoftware(response.subject);
+    });
+
+    const getPrioridade = async () => {
+      const flowCodes = await cadastroUseCases.getPrioridade();
+      return flowCodes;
+    };
+    getPrioridade().then((response) => {
+      setListPrioridade(response.priority);
+    });
   };
   const handleChangePrioridade = (event) => {
     setPrioridade(event.target.value);
@@ -70,8 +92,57 @@ export default function Cadastro() {
   const handleChangemSoftware = (event) => {
     setSoftware(event.target.value);
   };
+  const handleChangemTitulo = (event) => {
+    setTitulo(event.target.value);
+  };
+
+  const editor = React.useRef(null);
+  const [content, setContent] = React.useState("");
+  const config = {
+    readonly: false, // all options from https://xdsoft.net/jodit/docs/,
+  };
+
   function CadastraTicket() {
-    const getCadastraTicket = async () => {
+    console.log("titulo", titulo);
+    console.log("motivo", motivo);
+    console.log("software", software);
+    console.log("ramal", ramal);
+    console.log("content", content);
+
+    const config = {
+      headers: {
+        Authorization: "gestor",
+      },
+    };
+
+    api
+      .post("/ticket", {
+        title: titulo,
+        reason: {
+          uuid: motivo,
+        },
+        subject: {
+          uuid: software,
+        },
+        priority: {
+          uuid: "8029706a-e065-11ed-b5ea-0242ac120002",
+        },
+        user: {
+          uuid: "fa264230-cc2f-4483-828b-d9e77b5e3f22",
+        },
+        contact: ramal,
+        descriptions: [
+          {
+            description: content,
+          },
+        ],
+      })
+      .then((response) => console.log("deu boa"))
+      .catch((err) => {
+        console.error("ops! ocorreu um erro" + err);
+      });
+
+    /*     const getCadastraTicket = async () => {
       const flowCodes = await cadastroUseCases.cadastraTicket();
 
       return flowCodes;
@@ -81,7 +152,7 @@ export default function Cadastro() {
       console.log(response);
 
       //setStepFlow(response.data.flow);
-    });
+    }); */
   }
 
   /*   React.useEffect(() => {
@@ -93,20 +164,18 @@ export default function Cadastro() {
     setListSoftware(element.subjects);   
 }); */
 
-  const editor = React.useRef(null);
-  const [content, setContent] = React.useState("");
-  const config = {
-    readonly: false, // all options from https://xdsoft.net/jodit/docs/,
-  };
   return (
     <>
-      <div style={{ display: "flex", marginLeft: 10, background: "#1976d2", justifyContent: "space-around", maxWidth: 730}}>
-        <Typography
-          variant="h6"
-          noWrap
-          component="div"
-          sx={{ color: "white" }}
-        >
+      <div
+        style={{
+          display: "flex",
+          marginLeft: 10,
+          background: "#1976d2",
+          justifyContent: "space-around",
+          maxWidth: 730,
+        }}
+      >
+        <Typography variant="h6" noWrap component="div" sx={{ color: "white" }}>
           Cadastrado de Chamado
         </Typography>
       </div>
@@ -157,12 +226,12 @@ export default function Cadastro() {
                   onChange={handleChangeInfra}
                 >
                   <FormControlLabel
-                    value={false}
+                    value={true}
                     control={<Radio />}
                     label="Sim"
                   />
                   <FormControlLabel
-                    value={true}
+                    value={false}
                     control={<Radio />}
                     label="Não"
                   />
@@ -215,8 +284,9 @@ export default function Cadastro() {
             <TextField
               label="Titulo"
               id="outlined-size-small"
-              defaultValue=""
+              defaultValue={titulo}
               size="small"
+              onChange={handleChangemTitulo}
             />
           </div>
           <div className={infraestrutura ? "" : "escondeDiv"}>
@@ -230,13 +300,9 @@ export default function Cadastro() {
                 onChange={handleChangePrioridade}
                 style={prioridade == 2 ? { color: "red" } : {}}
               >
-                {/*               <MenuItem value="">
-                <em> </em>
-            </MenuItem> */}
-                <MenuItem value={1}>Padrão</MenuItem>
-                <MenuItem value={2} style={{ color: "red" }}>
-                  Urgente
-                </MenuItem>
+                {listPrioridade.map((item) => (
+                  <MenuItem style={item.description === "URGENTE" ? {color:"red"} : {} } value={item.uuid}>{item.description}</MenuItem>
+                ))}
               </Select>
             </FormControl>
           </div>
@@ -250,7 +316,7 @@ export default function Cadastro() {
             infraestrutura
               ? {
                   maxWidth: 707,
-                  marginLeft:9
+                  marginLeft: 9,
                 }
               : { display: "none" }
           }

@@ -18,5 +18,24 @@ class CadastroRepository {
             return error.response
         }
     }
+    
+    async GetSoftware(motivo) {
+        console.log('infraestrutura',motivo);
+        try {
+            const response = await http.get(`/subject/${motivo}`)
+            return response.data
+        } catch (error) {
+            return error.response
+        }
+    }   
+    async GetPrioridade() {
+        try {
+            const response = await http.get(`/priority`)
+            return response.data
+        } catch (error) {
+            return error.response
+        }
+    }       
+     
 }
 export const cadastroRepository = new CadastroRepository()
