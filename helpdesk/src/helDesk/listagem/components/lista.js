@@ -10,27 +10,43 @@ import Button from '@mui/material/Button';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import axios from 'axios';
 import './styles/lista.css';
+import Modal from "./modalView";
+import {createRoot} from 'react-dom/client';
 
-export default function BasicTable() {
-
-  function createData(chamado, usuario, motivo, prioridade, titulo, situacao, editDel) {
-    return { chamado, usuario, usuario, motivo, prioridade, titulo, situacao, editDel };
-  }
-  
-  let acao = <Button><VisibilityIcon fontSize="medium" /></Button>
-            
+export default function BasicTable({...props}) {
 
  const [getTicket, setTicket] = useState([]);
- const [getAuthorization, setAuthorization] = useState("gestor");
+ const [name, setName] = useState('');
 
- const config = {
-  headers:{
-    Authorization: getAuthorization,
-  }
-};
+
+
+ const childToParent = (childdata) => {
+  setName(childdata);
+}
+
+const modalName = (evt, id) => {
+  evt.preventDefault();
+  console.log("chamou notification");
+   const container = document.getElementById('view');
+   const root = createRoot(container);
+   return root.render(
+       <Modal setOpen={true} childToParent={childToParent} id={id}/>
+   )       
+}
+
+
 
  useEffect(() => {
-  axios.get('http://10.0.11.110:9000/ticket', config)
+
+  const user = localStorage.getItem("user");
+  console.log("user",user);
+  const config = {
+    headers:{
+      Authorization: user,
+    }
+  };
+
+  axios.get('http://10.0.11.149:9000/ticket', config)
   .then(function (response) {
     setTicket(response.data.tickets);
   })
@@ -39,11 +55,12 @@ export default function BasicTable() {
   })
   .finally(function () {
   });
-}, [getAuthorization]);
+}, []);
 
 console.log(getTicket)
 
   return (
+    <>
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
@@ -71,11 +88,14 @@ console.log(getTicket)
               <TableCell align="left">{row.priority.description}</TableCell>
               <TableCell align="left">{row.title}</TableCell>
               <TableCell align="left">{row.situation.description}</TableCell>
-              <TableCell align="center">{acao}</TableCell>
+              <TableCell align="center">
+                <Button onClick={(evt) => modalName(evt, row.uuid)} title='Visualizar'><VisibilityIcon fontSize="medium" title='Visualizar' /></Button></TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     </TableContainer>
+    <input type="hidden" id="view"/>
+    </>
   );
 }

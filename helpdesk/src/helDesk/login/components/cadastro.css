@@ -1,0 +1,23 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+.buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.richText {
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 10px;
+}
+
+#colaboradorButton {
+    margin-right: 10px;
+}

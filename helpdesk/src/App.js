@@ -1,10 +1,10 @@
 import './App.css';
-import  Listagem  from "./helDesk/listagem/pages/listagem";
+import { MainRoutes } from './Routes';
 
 function App() {
   return (
     <div className="App">
-        <Listagem />
+        <MainRoutes />
     </div>
   );
 }

@@ -6,13 +6,23 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import AddtIcon from '@mui/icons-material/Add';
 
+import { useNavigate } from "react-router-dom";
+
+
 export default function ButtonAppBar() {
+
+  const navigate = useNavigate();
+
+  function handleClickNavigator(){
+          navigate("/Cadastro");
+  }
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}></Typography>
-          <Button color="inherit" startIcon={<AddtIcon />}>Adicionar</Button>
+          <Button onClick={handleClickNavigator} color="inherit" startIcon={<AddtIcon />}>Adicionar</Button>
         </Toolbar>
       </AppBar>
     </Box>
