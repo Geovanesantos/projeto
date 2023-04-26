@@ -11,33 +11,34 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
-import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
-import Campos from "../components/Campos";
+import { useNavigate } from "react-router-dom";
+
 import "../../../App.css";
 import { cadastroUseCases } from "../useCases/useCases";
 
-import api from "../../api/Api";
+import Swal from 'sweetalert2'
 
 import JoditEditor from "jodit-react";
 
 export default function Cadastro() {
+  const navigate = useNavigate();
   const [motivo, setMotivo] = React.useState("");
   const [software, setSoftware] = React.useState("");
   const [prioridade, setPrioridade] = React.useState("");
   const [titulo, setTitulo] = React.useState("");
   const [ramal, setRamal] = React.useState("");
   const [viewInfra, setViewInfra] = React.useState("");
+  const [infraestrutura, setInfraestrutura] = React.useState("");
   const [listMotivo, setListMotivo] = React.useState([]);
   const [listSoftware, setListSoftware] = React.useState([]);
   const [listPrioridade, setListPrioridade] = React.useState([]);
-  const [infraestrutura, setInfraestrutura] = React.useState("");
 
   const handleChangeInfra = (event) => {
     setInfraestrutura(event.target.value);
-    console.log("clucou", infraestrutura);
+    localStorage.setItem('infra', event.target.value);
     const getInfra = async () => {
       const flowCodes = await cadastroUseCases.getMotivo(event.target.value);
       return flowCodes;
@@ -61,6 +62,7 @@ export default function Cadastro() {
   const handleChangeMotivo = (event) => {
     setMotivo(event.target.value);
     console.log("motivo", motivo);
+    localStorage.setItem('motivo', event.target.value);
 
     const getSoftware = async () => {
       const flowCodes = await cadastroUseCases.getSoftware(event.target.value);
@@ -79,11 +81,13 @@ export default function Cadastro() {
     });
   };
   const handleChangePrioridade = (event) => {
+    localStorage.setItem('prioridade', event.target.value);
     setPrioridade(event.target.value);
   };
 
   const handleChangeRamal = (event) => {
     setRamal(event.target.value);
+    localStorage.setItem('contato', event.target.value);
     if (ramal.length === 1) {
       setViewInfra("");
       setInfraestrutura("");
@@ -91,9 +95,11 @@ export default function Cadastro() {
   };
   const handleChangemSoftware = (event) => {
     setSoftware(event.target.value);
+    localStorage.setItem('software', event.target.value);
   };
   const handleChangemTitulo = (event) => {
     setTitulo(event.target.value);
+    localStorage.setItem('titulo', event.target.value);
   };
 
   const editor = React.useRef(null);
@@ -109,13 +115,7 @@ export default function Cadastro() {
     console.log("ramal", ramal);
     console.log("content", content);
 
-    const config = {
-      headers: {
-        Authorization: "gestor",
-      },
-    };
-
-    api
+/*     api
       .post("/ticket", {
         title: titulo,
         reason: {
@@ -125,7 +125,7 @@ export default function Cadastro() {
           uuid: software,
         },
         priority: {
-          uuid: "8029706a-e065-11ed-b5ea-0242ac120002",
+          uuid: prioridade,
         },
         user: {
           uuid: "fa264230-cc2f-4483-828b-d9e77b5e3f22",
@@ -140,19 +140,41 @@ export default function Cadastro() {
       .then((response) => console.log("deu boa"))
       .catch((err) => {
         console.error("ops! ocorreu um erro" + err);
-      });
+      }); */
 
-    /*     const getCadastraTicket = async () => {
-      const flowCodes = await cadastroUseCases.cadastraTicket();
+        const getCadastraTicket = async () => {
+          const flowCodes = await cadastroUseCases.cadastraTicket(titulo, motivo, software, prioridade, ramal, content);
 
-      return flowCodes;
-    };
+          return flowCodes;
+        };
 
     getCadastraTicket().then((response) => {
-      console.log(response);
+      const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-start',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.addEventListener('mouseenter', Swal.stopTimer)
+          toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+      });
 
-      //setStepFlow(response.data.flow);
-    }); */
+      if(response !== "" && response.error !== null){
+        Toast.fire({
+          icon: 'warning',
+          title: response
+        });  
+      }else{
+        Toast.fire({
+          icon: 'success',
+          title: 'Chamado registrado com sucesso!'
+        }); 
+        //localStorage.clear();
+        navigate("/Listagem"); 
+      }
+    }); 
   }
 
   /*   React.useEffect(() => {
@@ -327,7 +349,7 @@ export default function Cadastro() {
             config={config}
             tabIndex={1} // tabIndex of textarea
             onBlur={(newContent) => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
-            onChange={(newContent) => {}}
+            onChange={(newContent) => {localStorage.setItem('descricao', newContent)}}
           />
         </div>
 
@@ -348,7 +370,7 @@ export default function Cadastro() {
           }
         >
           <div>
-            <Button variant="outlined">Voltar</Button>
+            <Button variant="outlined" onClick={()=> navigate("/Listagem")}>Voltar</Button>
           </div>
           <div>
             <Button variant="contained" onClick={CadastraTicket}>
