@@ -45,23 +45,11 @@ export default function Cadastro() {
     };
     getInfra().then((response) => {
       setListMotivo(response.reasons);
-
-      //   console.log("listMotivo",listMotivo);
-
-      //   listMotivo.forEach((element) => {
-      //     element.subjects.forEach((it) => {
-      //         console.log('it',it);
-      //       novosItens.push(it);
-      //     });
-      //   });
-      //   setListSoftware(novosItens);
-      //   console.log("listSoftware", listSoftware);
     });
   };
 
   const handleChangeMotivo = (event) => {
     setMotivo(event.target.value);
-    console.log("motivo", motivo);
     localStorage.setItem('motivo', event.target.value);
 
     const getSoftware = async () => {
@@ -108,45 +96,22 @@ export default function Cadastro() {
     readonly: false, // all options from https://xdsoft.net/jodit/docs/,
   };
 
+  function limpaLocalStorage() {
+    localStorage.removeItem("motivo");
+    localStorage.removeItem("titulo");
+    localStorage.removeItem("contato");
+    localStorage.removeItem("software");
+    localStorage.removeItem("descricao");
+    localStorage.removeItem("infra");
+    localStorage.removeItem("prioridade"); 
+    localStorage.removeItem('continueDraft');    
+  }
+
   function CadastraTicket() {
-    console.log("titulo", titulo);
-    console.log("motivo", motivo);
-    console.log("software", software);
-    console.log("ramal", ramal);
-    console.log("content", content);
-
-/*     api
-      .post("/ticket", {
-        title: titulo,
-        reason: {
-          uuid: motivo,
-        },
-        subject: {
-          uuid: software,
-        },
-        priority: {
-          uuid: prioridade,
-        },
-        user: {
-          uuid: "fa264230-cc2f-4483-828b-d9e77b5e3f22",
-        },
-        contact: ramal,
-        descriptions: [
-          {
-            description: content,
-          },
-        ],
-      })
-      .then((response) => console.log("deu boa"))
-      .catch((err) => {
-        console.error("ops! ocorreu um erro" + err);
-      }); */
-
-        const getCadastraTicket = async () => {
-          const flowCodes = await cadastroUseCases.cadastraTicket(titulo, motivo, software, prioridade, ramal, content);
-
-          return flowCodes;
-        };
+    const getCadastraTicket = async () => {
+      const flowCodes = await cadastroUseCases.cadastraTicket(titulo, motivo, software, prioridade, ramal, content);
+        return flowCodes;
+    };
 
     getCadastraTicket().then((response) => {
       const Toast = Swal.mixin({
@@ -171,16 +136,50 @@ export default function Cadastro() {
           icon: 'success',
           title: 'Chamado registrado com sucesso!'
         }); 
-        //localStorage.clear();
+        limpaLocalStorage();
         navigate("/Listagem"); 
       }
     }); 
   }
 
-  /*   React.useEffect(() => {
+React.useEffect(() => {
+  if(localStorage.getItem('continueDraft')){
+    setRamal(localStorage.getItem("contato"));
+    setInfraestrutura(localStorage.getItem("infra"));
+    setMotivo(localStorage.getItem("motivo"));
+    setSoftware(localStorage.getItem("software"));
+    setPrioridade(localStorage.getItem("prioridade"));
+    setTitulo(localStorage.getItem("titulo"));
+    setContent(localStorage.getItem("descricao"));
+    setViewInfra(1);
+    const getLisMotivo = async () => {
+      const flowCodes = await cadastroUseCases.getMotivo(infraestrutura);
+      return flowCodes;
+    };
+    getLisMotivo().then((response) => {
+      setListMotivo(response.reasons);
+    });  
+    
+    if(localStorage.getItem("motivo")){
+      const getListSoftware = async () => {
+        const flowCodes = await cadastroUseCases.getSoftware(localStorage.getItem("motivo"));
+        return flowCodes;
+      };
+      getListSoftware().then((response) => {
+        setListSoftware(response.subject);
+      }); 
+    } 
+    const getListPrioridade = async () => {
+      const flowCodes = await cadastroUseCases.getPrioridade();
+      return flowCodes;
+    };
+    getListPrioridade().then((response) => {
+      setListPrioridade(response.priority);
+    });
 
+  }
 }, []);
-*/
+
   /* listMotivo.forEach(element => {
     console.log("<<>>>>",element.subjects); 
     setListSoftware(element.subjects);   
@@ -219,7 +218,8 @@ export default function Cadastro() {
               sx={{ m: 1, width: "10ch" }}
               label="Contato"
               id="outlined-size-small"
-              defaultValue=""
+              defaultValue={ramal}
+              value={ramal}
               size="small"
               onChange={handleChangeRamal}
             />
@@ -307,6 +307,7 @@ export default function Cadastro() {
               label="Titulo"
               id="outlined-size-small"
               defaultValue={titulo}
+              value={titulo}
               size="small"
               onChange={handleChangemTitulo}
             />
