@@ -18,10 +18,11 @@ export default function ButtonAppBar() {
     
     if(rascunho){
       Swal.fire({
-        title: 'Existe chamado em digitação,deseja continuar?',
+        title: 'Existe chamado em digitação, deseja continuar?',
         showDenyButton: true,
         showCancelButton: true,
         confirmButtonText: 'Sim',
+        confirmButtonColor: '#33bd3b',
         denyButtonText: `Nao`,
       }).then((result) => {
         if (result.isConfirmed) {
