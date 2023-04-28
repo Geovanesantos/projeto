@@ -4,16 +4,17 @@ let message = "";
 class CadastroUseCases {
     async cadastraTicket(titulo, motivo, software, prioridade, ramal, content) {
         message = "";
-        if(titulo === ""){
+        console.log("titulo",titulo);
+        if(titulo === "" || titulo === null){
             message += "Titulo deve ser informado!\n";
         }
-        if(motivo === ""){
+        if(motivo === "" || motivo === null){
             message += "Motivo deve ser informado!\n";
         }
-        if(software === ""){
+        if(software === "" || software === null){
             message += "Software deve ser informado!\n";
         }
-        if(prioridade === ""){
+        if(prioridade === "" || prioridade === null){
             message += "Prioridade deve ser informado!\n";
         }      
         if(content.length <= 15){

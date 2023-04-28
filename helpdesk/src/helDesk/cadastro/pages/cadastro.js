@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import "../../../App.css";
 import { cadastroUseCases } from "../useCases/useCases";
 
-import Swal from 'sweetalert2'
+import Swal from "sweetalert2";
 
 import JoditEditor from "jodit-react";
 
@@ -38,7 +38,7 @@ export default function Cadastro() {
 
   const handleChangeInfra = (event) => {
     setInfraestrutura(event.target.value);
-    localStorage.setItem('infra', event.target.value);
+    localStorage.setItem("infra", event.target.value);
     const getInfra = async () => {
       const flowCodes = await cadastroUseCases.getMotivo(event.target.value);
       return flowCodes;
@@ -50,7 +50,7 @@ export default function Cadastro() {
 
   const handleChangeMotivo = (event) => {
     setMotivo(event.target.value);
-    localStorage.setItem('motivo', event.target.value);
+    localStorage.setItem("motivo", event.target.value);
 
     const getSoftware = async () => {
       const flowCodes = await cadastroUseCases.getSoftware(event.target.value);
@@ -69,13 +69,13 @@ export default function Cadastro() {
     });
   };
   const handleChangePrioridade = (event) => {
-    localStorage.setItem('prioridade', event.target.value);
+    localStorage.setItem("prioridade", event.target.value);
     setPrioridade(event.target.value);
   };
 
   const handleChangeRamal = (event) => {
     setRamal(event.target.value);
-    localStorage.setItem('contato', event.target.value);
+    localStorage.setItem("contato", event.target.value);
     if (ramal.length === 1) {
       setViewInfra("");
       setInfraestrutura("");
@@ -83,17 +83,19 @@ export default function Cadastro() {
   };
   const handleChangemSoftware = (event) => {
     setSoftware(event.target.value);
-    localStorage.setItem('software', event.target.value);
+    localStorage.setItem("software", event.target.value);
   };
   const handleChangemTitulo = (event) => {
     setTitulo(event.target.value);
-    localStorage.setItem('titulo', event.target.value);
+    localStorage.setItem("titulo", event.target.value);
   };
 
   const editor = React.useRef(null);
   const [content, setContent] = React.useState("");
   const config = {
     readonly: false, // all options from https://xdsoft.net/jodit/docs/,
+    spellcheck: true,//para corretor ortografico
+
   };
 
   function limpaLocalStorage() {
@@ -103,82 +105,90 @@ export default function Cadastro() {
     localStorage.removeItem("software");
     localStorage.removeItem("descricao");
     localStorage.removeItem("infra");
-    localStorage.removeItem("prioridade"); 
-    localStorage.removeItem('continueDraft');    
+    localStorage.removeItem("prioridade");
+    localStorage.removeItem("continueDraft");
   }
 
   function CadastraTicket() {
     const getCadastraTicket = async () => {
-      const flowCodes = await cadastroUseCases.cadastraTicket(titulo, motivo, software, prioridade, ramal, content);
-        return flowCodes;
+      const flowCodes = await cadastroUseCases.cadastraTicket(
+        titulo,
+        motivo,
+        software,
+        prioridade,
+        ramal,
+        content
+      );
+      return flowCodes;
     };
 
     getCadastraTicket().then((response) => {
       const Toast = Swal.mixin({
         toast: true,
-        position: 'top-start',
+        position: "top-start",
         showConfirmButton: false,
         timer: 3000,
         timerProgressBar: true,
         didOpen: (toast) => {
-          toast.addEventListener('mouseenter', Swal.stopTimer)
-          toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
+          toast.addEventListener("mouseenter", Swal.stopTimer);
+          toast.addEventListener("mouseleave", Swal.resumeTimer);
+        },
       });
 
-      if(response !== "" && response.error !== null){
+      if (response !== "" && response.error !== null) {
         Toast.fire({
-          icon: 'warning',
-          title: response
-        });  
-      }else{
+          icon: "warning",
+          title: response,
+        });
+      } else {
         Toast.fire({
-          icon: 'success',
-          title: 'Chamado registrado com sucesso!'
-        }); 
+          icon: "success",
+          title: "Chamado registrado com sucesso!",
+        });
         limpaLocalStorage();
-        navigate("/Listagem"); 
+        navigate("/Listagem");
       }
-    }); 
+    });
   }
 
-React.useEffect(() => {
-  if(localStorage.getItem('continueDraft')){
-    setRamal(localStorage.getItem("contato"));
-    setInfraestrutura(localStorage.getItem("infra"));
-    setMotivo(localStorage.getItem("motivo"));
-    setSoftware(localStorage.getItem("software"));
-    setPrioridade(localStorage.getItem("prioridade"));
-    setTitulo(localStorage.getItem("titulo"));
-    setContent(localStorage.getItem("descricao"));
-    setViewInfra(1);
-    const getLisMotivo = async () => {
-      const flowCodes = await cadastroUseCases.getMotivo(infraestrutura);
-      return flowCodes;
-    };
-    getLisMotivo().then((response) => {
-      setListMotivo(response.reasons);
-    });  
-    
-    if(localStorage.getItem("motivo")){
-      const getListSoftware = async () => {
-        const flowCodes = await cadastroUseCases.getSoftware(localStorage.getItem("motivo"));
+  React.useEffect(() => {
+    if (localStorage.getItem("continueDraft")) {
+      setRamal(localStorage.getItem("contato"));
+      setInfraestrutura(localStorage.getItem("infra"));
+      setMotivo(localStorage.getItem("motivo"));
+      setSoftware(localStorage.getItem("software"));
+      setPrioridade(localStorage.getItem("prioridade"));
+      setTitulo(localStorage.getItem("titulo"));
+      setContent(localStorage.getItem("descricao"));
+      setViewInfra(1);
+      const getLisMotivo = async () => {
+        const flowCodes = await cadastroUseCases.getMotivo(infraestrutura);
         return flowCodes;
       };
-      getListSoftware().then((response) => {
-        setListSoftware(response.subject);
-      }); 
-    } 
-    const getListPrioridade = async () => {
-      const flowCodes = await cadastroUseCases.getPrioridade();
-      return flowCodes;
-    };
-    getListPrioridade().then((response) => {
-      setListPrioridade(response.priority);
-    });
+      getLisMotivo().then((response) => {
+        setListMotivo(response.reasons);
+      });
 
-  }
-}, []);
+      if (localStorage.getItem("motivo")) {
+        const getListSoftware = async () => {
+          const flowCodes = await cadastroUseCases.getSoftware(
+            localStorage.getItem("motivo")
+          );
+          return flowCodes;
+        };
+        getListSoftware().then((response) => {
+          setListSoftware(response.subject);
+        });
+      }
+      const getListPrioridade = async () => {
+        const flowCodes = await cadastroUseCases.getPrioridade();
+        return flowCodes;
+      };
+      getListPrioridade().then((response) => {
+        setListPrioridade(response.priority);
+      });
+    }
+  }, []);
 
   /* listMotivo.forEach(element => {
     console.log("<<>>>>",element.subjects); 
@@ -324,7 +334,14 @@ React.useEffect(() => {
                 style={prioridade == 2 ? { color: "red" } : {}}
               >
                 {listPrioridade.map((item) => (
-                  <MenuItem style={item.description === "URGENTE" ? {color:"red"} : {} } value={item.uuid}>{item.description}</MenuItem>
+                  <MenuItem
+                    style={
+                      item.description === "URGENTE" ? { color: "red" } : {}
+                    }
+                    value={item.uuid}
+                  >
+                    {item.description}
+                  </MenuItem>
                 ))}
               </Select>
             </FormControl>
@@ -350,7 +367,9 @@ React.useEffect(() => {
             config={config}
             tabIndex={1} // tabIndex of textarea
             onBlur={(newContent) => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
-            onChange={(newContent) => {localStorage.setItem('descricao', newContent)}}
+            onChange={(newContent) => {
+              localStorage.setItem("descricao", newContent);
+            }}
           />
         </div>
 
@@ -358,22 +377,20 @@ React.useEffect(() => {
             div Botões para confirmar
         */}
         <div
-          style={
-            infraestrutura
-              ? {
-                  display: "grid",
-                  maxWidth: 1092,
-                  gridTemplateColumns: "repeat(2, 1fr)",
-                  marginLeft: 10,
-                  marginTop: 20,
-                }
-              : { display: "none" }
-          }
+          style={{
+            display: "grid",
+            maxWidth: 1092,
+            gridTemplateColumns: "repeat(2, 1fr)",
+            marginLeft: 10,
+            marginTop: 20,
+          }}
         >
           <div>
-            <Button variant="outlined" onClick={()=> navigate("/Listagem")}>Voltar</Button>
+            <Button variant="outlined" onClick={() => navigate("/Listagem")}>
+              Voltar
+            </Button>
           </div>
-          <div>
+          <div style={infraestrutura ? {} : { display: "none" }}>
             <Button variant="contained" onClick={CadastraTicket}>
               Confirmar
             </Button>

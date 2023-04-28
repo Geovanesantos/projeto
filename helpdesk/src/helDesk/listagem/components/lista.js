@@ -57,10 +57,8 @@ const modalName = (evt, id) => {
   });
 }, []);
 
-console.log(getTicket)
-
   return (
-    <>
+    <div>
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
@@ -96,6 +94,6 @@ console.log(getTicket)
       </Table>
     </TableContainer>
     <input type="hidden" id="view"/>
-    </>
+    </div>
   );
 }
