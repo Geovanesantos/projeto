@@ -1,0 +1,5 @@
+react navigation
+https://reactnavigation.org/docs/hello-react-navigation
+
+componentes 
+https://callstack.github.io/react-native-paper/docs/components/ActivityIndicator
