@@ -12,7 +12,6 @@ export default function HomeScreen({ navigation }) {
     </View>
   );
 }
-
 const style = StyleSheet.create({
   container: {
     flex: 1,
